@@ -24,6 +24,7 @@ fn window_conf() -> Conf {
         window_title: "Tiny Flappy Bird".to_owned(),
         window_width: 320,
         window_height: 568,
+        window_resizable: false, 
         ..Default::default()
     }
 }

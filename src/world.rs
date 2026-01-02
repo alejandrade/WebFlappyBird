@@ -120,8 +120,8 @@ impl Node for World {
 
         if self.timer >= self.pipe_spawn_time {
             // Generate next location within ±4 positions of last
-            let min_index = if self.last_pipe_location_index >= 4 {
-                self.last_pipe_location_index - 4
+            let min_index = if self.last_pipe_location_index >= 6 {
+                self.last_pipe_location_index - 6
             } else {
                 0
             };
