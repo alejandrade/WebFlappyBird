@@ -37,3 +37,5 @@ frontend/static/assets/*.wasm
 # --- OS Specific ---
 .DS_Store
 Thumbs.db
+
+.npmrc
