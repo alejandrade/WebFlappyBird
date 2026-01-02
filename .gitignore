@@ -1,0 +1,39 @@
+# --- Rust & Cargo ---
+/target
+Cargo.lock
+
+# --- AI & LLM ---
+.claude/
+.anthropic/
+.aider*
+.cursor/
+*.gguf
+*.onnx
+*.bin
+
+# --- IDEA & Editors ---
+.idea/
+*.iml
+.vscode/
+.history/
+
+# --- Node & NPM ---
+node_modules/
+.npm
+package-lock.json
+*-debug.log*
+
+# --- Frontend Build Artifacts ---
+frontend/.svelte-kit/
+frontend/build/
+frontend/static/gl.js
+frontend/static/*.wasm
+frontend/static/assets/*.wasm
+
+# --- Game Assets (Whitelisting) ---
+!assets/sprites/
+!assets/audio/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
