@@ -28,7 +28,7 @@ frontend/.svelte-kit/
 frontend/build/
 frontend/static/gl.js
 frontend/static/*.wasm
-frontend/static/assets/*.wasm
+frontend/static/assets/
 
 # --- Game Assets (Whitelisting) ---
 !assets/sprites/

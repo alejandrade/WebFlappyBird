@@ -3,15 +3,210 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Primary Meta Tags -->
+		<title>MiniFlappyBird - Play Flappy Bird Clone Online | WebAssembly Game</title>
+		<meta name="title" content="MiniFlappyBird - Play Flappy Bird Clone Online | WebAssembly Game" />
+		<meta name="description" content="Play MiniFlappyBird, a fun Flappy Bird clone built with Rust and WebAssembly. Tap or press space to flap through pipes. Free browser game with retro pixel art graphics." />
+		<meta name="keywords" content="flappy bird, flappy bird clone, browser game, webassembly game, rust game, free online game, pixel art game, casual game, mini game" />
+		<meta name="author" content="alejandrade" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://alejandrade.github.io/WebFlappyBird/" />
+		<meta property="og:title" content="MiniFlappyBird - Play Flappy Bird Clone Online" />
+		<meta property="og:description" content="Play MiniFlappyBird, a fun Flappy Bird clone built with Rust and WebAssembly. Free browser game with retro pixel art graphics." />
+		<meta property="og:image" content="https://github.com/alejandrade.png" />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://alejandrade.github.io/WebFlappyBird/" />
+		<meta property="twitter:title" content="MiniFlappyBird - Play Flappy Bird Clone Online" />
+		<meta property="twitter:description" content="Play MiniFlappyBird, a fun Flappy Bird clone built with Rust and WebAssembly. Free browser game." />
+		<meta property="twitter:image" content="https://github.com/alejandrade.png" />
+
+		<!-- Additional SEO -->
+		<meta name="theme-color" content="#667eea" />
+		<link rel="canonical" href="https://alejandrade.github.io/WebFlappyBird/" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
 			rel="stylesheet"
 		/>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			html, body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			body {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				font-family: 'Press Start 2P', cursive;
+			}
+			.game-container {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 20px;
+				padding: 20px;
+			}
+			.game-header {
+				text-align: center;
+				color: white;
+				text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+			}
+			.game-header h1 {
+				margin: 0;
+				font-size: 24px;
+				letter-spacing: 2px;
+			}
+			.game-header p {
+				margin: 10px 0 0 0;
+				font-size: 10px;
+				opacity: 0.9;
+			}
+			.canvas-wrapper {
+				position: relative;
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+				border-radius: 8px;
+				overflow: hidden;
+				background: #70c5ce;
+			}
+			canvas {
+				display: block;
+				width: 320px;
+				height: 568px;
+				image-rendering: pixelated;
+				image-rendering: crisp-edges;
+			}
+			.game-controls {
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				padding: 15px 25px;
+				border-radius: 8px;
+				color: white;
+				text-align: center;
+				font-size: 10px;
+				line-height: 1.8;
+			}
+			.game-controls strong {
+				color: #ffd700;
+			}
+			.game-links {
+				display: flex;
+				gap: 15px;
+				align-items: center;
+				justify-content: center;
+			}
+			.github-link,
+			.kofi-link {
+				color: white;
+				text-decoration: none;
+				font-size: 12px;
+				padding: 10px 15px;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.github-link {
+				background: rgba(0, 0, 0, 0.3);
+			}
+			.github-link:hover {
+				background: rgba(0, 0, 0, 0.5);
+				transform: translateY(-2px);
+			}
+			.github-link svg {
+				width: 20px;
+				height: 20px;
+				fill: white;
+			}
+			.kofi-link {
+				background: #FF5E5B;
+				box-shadow: 0 4px 12px rgba(255, 94, 91, 0.4);
+			}
+			.kofi-link:hover {
+				background: #ff4542;
+				transform: translateY(-2px);
+				box-shadow: 0 6px 16px rgba(255, 94, 91, 0.6);
+			}
+			/* Mobile: keep native canvas size, centered */
+			@media (max-width: 768px) {
+				body {
+					justify-content: center;
+					padding: 0;
+				}
+				.game-container {
+					padding: 0;
+					gap: 0;
+					width: 100%;
+					height: 100vh;
+					justify-content: center;
+				}
+				.game-header,
+				.game-controls,
+				.game-links {
+					display: none;
+				}
+				.canvas-wrapper {
+					box-shadow: none;
+					border-radius: 0;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+				canvas {
+					/* Canvas stays at exact 320x568 - no resizing! */
+					width: 320px;
+					height: 568px;
+				}
+			}
+		</style>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
+		<div class="game-container">
+			<div class="game-header">
+				<h1>MiniFlappyBird</h1>
+				<p>A Tiny Flappy Bird Clone</p>
+			</div>
+			<div class="canvas-wrapper">
+				<canvas id="glcanvas" tabindex="0"></canvas>
+			</div>
+			<div class="game-controls">
+				<strong>SPACE</strong> or <strong>CLICK</strong> to flap
+			</div>
+			<div class="game-links">
+				<a href="https://github.com/alejandrade/WebFlappyBird" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="View source on GitHub">
+					<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+					</svg>
+					GitHub
+				</a>
+				<a href="https://ko-fi.com/alejandrade" target="_blank" rel="noopener noreferrer" class="kofi-link" aria-label="Support on Ko-fi">
+					☕ Support
+				</a>
+			</div>
+		</div>
+		<script src="/mq_js_bundle.js"></script>
+		<script>
+			load("/WebFlappyBird.wasm");
+		</script>
 	</body>
 </html>
