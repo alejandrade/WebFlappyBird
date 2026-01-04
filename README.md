@@ -1,10 +1,10 @@
-# MiniFlappyBird 🐦
+# MiniFlappyBird
 
 A clean Flappy Bird clone built in **Rust** with WebAssembly support. Play it natively on desktop or in your browser!
 
-**[🎮 Play Online](https://alejandrade.github.io/WebFlappyBird/)** | **[☕ Support the Project](https://ko-fi.com/alejandrade)**
+**[Play Online](https://alejandrade.github.io/WebFlappyBird/)** | **[☕ Support the Project](https://ko-fi.com/alejandrade)**
 
-## 🎯 How to Play
+##  How to Play
 
 Navigate your bird through an endless series of pipes by tapping or clicking to flap. Each successful pass through a pipe earns you a point. The game gets progressively harder as you score more points!
 
@@ -19,7 +19,7 @@ Navigate your bird through an endless series of pipes by tapping or clicking to 
 * Try to stay in the middle of the screen when possible
 * Your high score is saved automatically
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Play in Browser
 Simply visit **[alejandrade.github.io/WebFlappyBird](https://alejandrade.github.io/WebFlappyBird/)** to play instantly - no installation required!
@@ -68,23 +68,23 @@ This repository includes a GitHub Actions workflow that automatically builds and
 
 Your game will be available at: `https://<username>.github.io/WebFlappyBird/`
 
-## 🛠️ Built With
+## Built With
 
 * **[Macroquad](https://github.com/not-fl3/macroquad)** - Simple and easy-to-use game library for Rust
 * **[quad-snd](https://github.com/not-fl3/quad-snd)** - Audio playback for Macroquad
 * **WebAssembly** - For browser compatibility
 * **SvelteKit** - Frontend framework for web deployment
 
-## 🎨 Features
+## Features
 
-* ✨ Pixel-perfect retro graphics
-* 🎵 Background music with fade transitions
-* 🔊 Sound effects for flapping, scoring, and collisions
-* 📱 Fully responsive - works on desktop and mobile
-* 💾 Automatic high score tracking
-* 🌐 Runs natively or in browser via WebAssembly
+*  Pixel-perfect retro graphics
+* Background music with fade transitions
+* Sound effects for flapping, scoring, and collisions
+* Fully responsive - works on desktop and mobile
+* Automatic high score tracking
+* Runs natively or in browser via WebAssembly
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 WebFlappyBird/
@@ -104,7 +104,7 @@ WebFlappyBird/
 
 If you enjoy this game, consider [buying me a coffee](https://ko-fi.com/alejandrade)! Your support helps me create more open-source projects.
 
-## 📜 License
+## License
 
 This project is licensed under the **CC BY-NC-SA 4.0** (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International).
 
@@ -121,4 +121,4 @@ See the [LICENSE](LICENSE) file for details.
 
 ---
 
-Made with ❤️ and Rust 🦀
+Made with Rust
