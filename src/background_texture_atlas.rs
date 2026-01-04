@@ -48,10 +48,18 @@ impl BackgroundTextureAtlas {
         }
     }
 
-    pub async fn get_texture(background_type: &str) -> Texture2D {
+    async fn get_texture(background_type: &str) -> Texture2D {
         let path = format!("assets/sprites/background-{}.png", background_type);
         load_texture(&path)
             .await
             .expect("Failed to load texture")
+    }
+
+    pub fn get_texture_2d(&self, background_type: BackgroundType) -> &Texture2D {
+        if background_type.as_str() == BackgroundType::Day.as_str() {
+            &self.background_sprites.day_texture
+        } else {
+            &self.background_sprites.night_texture
+        }
     }
 }

@@ -57,7 +57,6 @@ impl MusicPlayer {
             println!("[MUSIC] Loaded {} in {:.2}s", filename, get_time() - start);
             sounds.push(sound);
         }
-
         Ok(Self {
             sounds,
             current_index: 0,

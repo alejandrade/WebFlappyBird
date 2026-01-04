@@ -54,4 +54,12 @@ impl PipeTextureAtlas {
             .await
             .expect("Failed to load texture")
     }
+
+    pub fn get_texture_2d(&self, pipe_color: PipeColor) -> &Texture2D {
+        if pipe_color.as_str() == PipeColor::Green.as_str() {
+            &self.pipe_sprites.green_texture
+        } else {
+            &self.pipe_sprites.red_texture
+        }
+    }
 }

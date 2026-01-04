@@ -13,6 +13,7 @@ mod base;
 mod sound_effects;
 
 use macroquad::prelude::*;
+use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::game_state::GameState;
 use crate::music_player::MusicPlayer;
 use crate::player::Player;
@@ -55,56 +56,21 @@ fn draw_loading_screen() {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    // Show loading screen
     clear_background(BLACK);
     draw_loading_screen();
     next_frame().await;
-
-    // Load all assets sequentially
-    let start_time = get_time();
-    println!("[LOADING] Starting asset loading at {:.2}s", start_time);
-
-    let t = get_time();
-    println!("[LOADING] Loading background texture...");
-    let background = load_texture("assets/sprites/background-day.png")
-        .await
-        .expect("Failed to load background");
-    println!("[LOADING] Background loaded in {:.2}s", get_time() - t);
-
-    let t = get_time();
-    println!("[LOADING] Loading message texture...");
     let message = load_texture("assets/sprites/message.png")
         .await
         .expect("Failed to load message");
-    println!("[LOADING] Message loaded in {:.2}s", get_time() - t);
-
-    let t = get_time();
-    println!("[LOADING] Loading music...");
-    let music_player = MusicPlayer::new("assets/music", 2.0)
-        .await
-        .expect("Failed to load music");
-    println!("[LOADING] Music loaded in {:.2}s", get_time() - t);
-
-    println!("[LOADING] Total loading time: {:.2}s", get_time() - start_time);
-
-    // Set texture filter to nearest for pixel art
-    background.set_filter(FilterMode::Nearest);
     message.set_filter(FilterMode::Nearest);
-    let sound_effects = SoundEffects::new().await;
-    let player = &mut Player::new().await;
-    let world = &mut World::new().await;
-    let mut game_state = GameState::new(music_player, sound_effects);
-    game_state.music_player_mut().play();
+
+
+    let mut game_state = GameState::new().await;
 
     loop {
         clear_background(BLACK);
-
-        // Update game state
-        game_state.update(player, world);
-
-        // Draw current scene
-        game_state.draw(&background, &message, player, world);
-
+        game_state.update();
+        game_state.draw(&message);
         next_frame().await
     }
 }

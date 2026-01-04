@@ -1,6 +1,10 @@
 use std::rc::Rc;
+use macroquad::color::WHITE;
+use macroquad::prelude::vec2;
 use macroquad::rand::gen_range;
-use crate::background_texture_atlas::BackgroundTextureAtlas;
+use macroquad::texture::{draw_texture_ex, DrawTextureParams};
+use macroquad::window::{screen_height, screen_width};
+use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
 use crate::base::Base;
 use crate::base_texture_atlas::BaseTextureAtlas;
 use crate::components::Node;
@@ -25,8 +29,7 @@ pub struct World {
 
 
 impl World {
-    pub async fn new() -> Self {
-        let background_texture_atlas = BackgroundTextureAtlas::new().await;
+    pub async fn new(background_texture_atlas: BackgroundTextureAtlas) -> Self {
         let pipe_texture_atlas = Rc::new(PipeTextureAtlas::new().await);
         let base_texture_atlas = BaseTextureAtlas::new().await;
         let number_texture_atlas = NumberTextureAtlas::new().await;
@@ -47,9 +50,12 @@ impl World {
     }
 
     pub fn touched(&self, player: &Player) -> bool {
+        // Check if player flew off screen (top or bottom)
+        let off_screen = player.position.y < 0.0 || player.position.y > screen_height();
+
         self.pipes.iter().any(|(pipe1, pipe2)| {
             pipe1.touched(player) || pipe2.touched(player)
-        }) || self.base.touched(player)
+        }) || self.base.touched(player) || off_screen
     }
 
     pub fn end(&mut self) {
@@ -120,14 +126,8 @@ impl Node for World {
 
         if self.timer >= self.pipe_spawn_time {
             // Generate next location within ±4 positions of last
-            let min_index = if self.last_pipe_location_index >= 6 {
-                self.last_pipe_location_index - 6
-            } else {
-                0
-            };
-            let max_index = (self.last_pipe_location_index + 4).min(9);
-
-            let r = gen_range(min_index, max_index + 1);
+            // Removed concept of range limit - always select from all possible locations (0-9)
+            let r = gen_range(0, 10); // Generates a number from 0 to 9 inclusive
             let location = match r {
                 0 => PipeLocation::VeryHigh,
                 1 => PipeLocation::High,
@@ -140,12 +140,15 @@ impl Node for World {
                 8 => PipeLocation::VeryLow,
                 _ => PipeLocation::Lowest,
             };
+            println!("Generated PipeLocation: {:?}", location);
 
             self.last_pipe_location_index = r;
             let base_height = self.base.height;
-
-            self.pipes.push((Pipe::new(Rc::clone(&self.pipe_texture_atlas),false, self.velocity, location.clone(), base_height),
-                             Pipe::new(Rc::clone(&self.pipe_texture_atlas), true, self.velocity, location, base_height) ));
+            let score= self.score;
+            self.pipes.push((
+                Pipe::new(Rc::clone(&self.pipe_texture_atlas),false, self.velocity, location.clone(), base_height, score),
+                Pipe::new(Rc::clone(&self.pipe_texture_atlas), true, self.velocity, location, base_height, score)
+            ));
             self.timer = 0.0;
         }
 
@@ -162,6 +165,24 @@ impl Node for World {
     }
 
     fn draw(&mut self) {
+        let background_texture = if (self.score / 10) % 2 != 0 {
+            self.background_texture_atlas.get_texture_2d(BackgroundType::Night)
+        } else {
+            self.background_texture_atlas.get_texture_2d(BackgroundType::Day)
+        };
+
+        draw_texture_ex(
+            background_texture,
+            0.0,
+            0.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(screen_width(), screen_height())),
+                ..Default::default()
+            },
+        );
+
+
         self.pipes.iter_mut().for_each(|(pipe1, pipe2)| {
             pipe1.draw();
             pipe2.draw();

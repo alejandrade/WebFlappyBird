@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
 use crate::player::Player;
@@ -16,15 +17,32 @@ pub struct GameState {
     scene: GameScene,
     music_player: MusicPlayer,
     sound_effects: SoundEffects,
+    world: World,
+    player: Player,
+    gameover_texture: Texture2D,
 }
 
 impl GameState {
-    pub fn new(music_player: MusicPlayer,
-                     sound_effects: SoundEffects) -> Self {
+    pub async fn new() -> Self {
+
+        let background_texture_atlas = BackgroundTextureAtlas::new().await;
+        let player = Player::new().await;
+        let world = World::new(background_texture_atlas).await;
+        let mut music_player = MusicPlayer::new("assets/music", 2.0)
+            .await
+            .expect("Failed to load music");
+        music_player.play();
+        let sound_effects = SoundEffects::new().await;
+        let gameover_texture = load_texture("assets/sprites/gameover.png")
+            .await
+            .expect("Failed to load gameover texture");
         Self {
             scene: GameScene::StartScreen,
             music_player,
-            sound_effects
+            sound_effects,
+            player,
+            world,
+            gameover_texture
         }
     }
 
@@ -36,21 +54,23 @@ impl GameState {
                 }
             }
             GameScene::Playing => {
-
             }
             GameScene::GameOver => {
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
                     self.scene = GameScene::StartScreen;
                     self.music_player.next();
+                    self.music_player.play();
                 }
             }
         }
     }
 
-    pub fn update(&mut self, player: &mut Player, world: &mut World) {
+    pub fn update(&mut self) {
         self.music_player.update();
         self.handle_input();
         let dt = get_frame_time();
+        let player  = &mut self.player;
+        let world = &mut self.world;
 
         match self.scene {
             GameScene::StartScreen => {
@@ -81,46 +101,53 @@ impl GameState {
                 }
             }
             GameScene::GameOver => {
-                // Continue updating player so they fall with gravity
+                
                 player.update(dt);
             }
         }
     }
 
-    pub fn draw(&self, background: &Texture2D, message: &Texture2D,
-                player: &mut Player, world: &mut World) {
-        // Draw background (always visible)
-        draw_texture_ex(
-            background,
-            0.0,
-            0.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(vec2(screen_width(), screen_height())),
-                ..Default::default()
-            },
-        );
-
+    pub fn draw(&mut self, message: &Texture2D) {
         match self.scene {
             GameScene::StartScreen => {
-                // Draw message centered
+                self.world.draw();
                 let msg_x = (screen_width() - message.width()) / 2.0;
                 let msg_y = (screen_height() - message.height()) / 2.0 - 50.0;
                 draw_texture(message, msg_x, msg_y, WHITE);
             }
             GameScene::Playing => {
-                player.draw();
-                world.draw();
+                self.world.draw();
+                self.player.draw();
+
             }
             GameScene::GameOver => {
                 // Draw game over screen
-                player.draw();
-                world.draw();
+                self.world.draw();
+                self.player.draw();
+
+                // Draw gameover image centered
+                let gameover_x = (screen_width() - self.gameover_texture.width()) / 2.0;
+                let gameover_y = (screen_height() - self.gameover_texture.height()) / 2.0 - 100.0;
+                draw_texture(&self.gameover_texture, gameover_x, gameover_y, WHITE);
+
+                // Draw instructions (two lines)
+                let font_size = 20.0;
+                let line_spacing = 25.0;
+
+                let line1 = "Press SPACE or click";
+                let line2 = "to continue";
+
+                let line1_dimensions = measure_text(line1, None, font_size as u16, 1.0);
+                let line2_dimensions = measure_text(line2, None, font_size as u16, 1.0);
+
+                let line1_x = (screen_width() - line1_dimensions.width) / 2.0;
+                let line2_x = (screen_width() - line2_dimensions.width) / 2.0;
+                let start_y = gameover_y + self.gameover_texture.height() + 50.0;
+
+                draw_text(line1, line1_x, start_y, font_size, WHITE);
+                draw_text(line2, line2_x, start_y + line_spacing, font_size, WHITE);
             }
         }
     }
 
-    pub fn music_player_mut(&mut self) -> &mut MusicPlayer {
-        &mut self.music_player
-    }
 }
