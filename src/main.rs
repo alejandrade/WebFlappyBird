@@ -13,12 +13,7 @@ mod base;
 mod sound_effects;
 
 use macroquad::prelude::*;
-use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::game_state::GameState;
-use crate::music_player::MusicPlayer;
-use crate::player::Player;
-use crate::sound_effects::SoundEffects;
-use crate::world::World;
 
 fn window_conf() -> Conf {
     Conf {

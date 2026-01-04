@@ -16,7 +16,6 @@ use crate::player::Player;
 pub struct World {
     pub score: u32,
     pub timer: f32,
-    pub night: bool,
     pub background_texture_atlas: BackgroundTextureAtlas,
     pub pipe_texture_atlas: Rc<PipeTextureAtlas>,
     pub pipes: Vec<(Pipe, Pipe)>,
@@ -37,7 +36,6 @@ impl World {
         World {
             score: 0,
             timer: 0.0,
-            night: false,
             background_texture_atlas,
             pipe_texture_atlas,
             pipes: Vec::new(),
@@ -79,7 +77,7 @@ impl World {
 
     pub fn player_passed_pipes(&mut self, player: &Player) -> bool {
         let mut passed = false;
-        self.pipes.iter_mut().for_each(|(pipe1, pipe2)| {
+        self.pipes.iter_mut().for_each(|(pipe1, _pipe2)| {
             if pipe1.has_passed(player) && !pipe1.passed {
                 pipe1.passed = true;
                 passed = true;

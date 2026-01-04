@@ -21,8 +21,6 @@ pub struct BackgroundSprites {
 
 pub struct BackgroundTextureAtlas {
     pub background_sprites: BackgroundSprites,
-    pub width: f32,
-    pub height: f32,
 }
 
 impl BackgroundTextureAtlas {
@@ -35,16 +33,11 @@ impl BackgroundTextureAtlas {
             t.set_filter(FilterMode::Nearest);
         }
 
-        let w = day.width();
-        let h = day.height();
-
         BackgroundTextureAtlas {
             background_sprites: BackgroundSprites {
                 day_texture: day,
                 night_texture: night,
             },
-            width: w,
-            height: h,
         }
     }
 

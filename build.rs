@@ -4,7 +4,6 @@ use std::path::Path;
 
 fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
-    let profile = env::var("PROFILE").unwrap();
 
     // Create symlink to assets in target directory
     let target_dir = Path::new(&out_dir)

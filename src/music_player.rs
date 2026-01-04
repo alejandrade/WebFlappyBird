@@ -163,13 +163,4 @@ impl MusicPlayer {
         }
     }
 
-    /// Get the current song index
-    pub fn current_track(&self) -> usize {
-        self.current_index
-    }
-
-    /// Get total number of tracks
-    pub fn track_count(&self) -> usize {
-        self.sounds.len()
-    }
 }

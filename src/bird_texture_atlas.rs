@@ -1,5 +1,3 @@
-use std::fs;
-use macroquad::Error;
 use macroquad::rand::gen_range;
 use macroquad::texture::{load_texture, FilterMode, Texture2D};
 

@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
+use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
 use crate::player::Player;

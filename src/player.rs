@@ -36,7 +36,7 @@ impl Player {
     }
 
     pub fn dead(&mut self)  {
-        if (self.alive) {
+        if self.alive {
             self.vel.x = -50.0;
             self.vel.y = self.jump_force;
         }
