@@ -28,7 +28,7 @@ impl Player {
             alive: true,
             position: Vec2::new(x, y),
             vel: Vec2::new(0.0, 0.0),
-            jump_force: -250.0,
+            jump_force: -300.0,
             bird_renderer,
             start_position: Vec2::new(x, y),
             rotation: 0.0,
@@ -53,8 +53,8 @@ impl Player {
 impl Node for Player {
 
     fn update(&mut self, dt: f32) {
-        let gravity = 500.0;
-        let max_fall_speed = 1000.0;
+        let gravity = 800.0;
+        let max_fall_speed = 1500.0;
         let max_horizontal_speed = 300.0;
 
         self.vel.y += gravity * dt;
@@ -69,7 +69,14 @@ impl Node for Player {
         if self.alive {
             // Only allow jumping when alive
             if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-                self.vel.y = self.jump_force
+
+                self.vel.y = if self.vel.y < 0.0 {
+                    self.jump_force - 100.0
+                }else {
+                    self.jump_force
+                };
+
+                println!("{}", self.vel.y )
             }
         } else {
             self.rotation -= 1.5 * dt;
@@ -77,13 +84,14 @@ impl Node for Player {
     }
 
     fn draw(&mut self) {
-        let texture = if self.vel.y < -50.0 {
-            &self.bird_renderer.bird_sprites.downflap_texture
+        let (texture, rotation) = if self.vel.y < -50.0 {
+            (&self.bird_renderer.bird_sprites.downflap_texture, 25.0)
         } else if self.vel.y > 50.0 {
-            &self.bird_renderer.bird_sprites.upflap_texture
+            (&self.bird_renderer.bird_sprites.upflap_texture, -25.0)
         } else {
-            &self.bird_renderer.bird_sprites.midflap_texture
+            (&self.bird_renderer.bird_sprites.midflap_texture, 0.0)
         };
+        self.rotation = rotation;
 
         let width = texture.width();
         let height = texture.height();
