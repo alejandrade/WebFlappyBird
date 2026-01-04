@@ -1,10 +1,10 @@
 use macroquad::color::WHITE;
 use macroquad::math::vec2;
 use macroquad::prelude::{draw_texture_ex, DrawTextureParams};
-use macroquad::window::screen_height;
 use crate::base_texture_atlas::BaseTextureAtlas;
 use crate::components::Node;
 use crate::player::Player;
+use crate::SCREEN_HEIGHT;
 
 pub struct Base {
     pub base_texture_atlas: BaseTextureAtlas,
@@ -42,7 +42,7 @@ impl Base {
     pub fn touched(&self, player: &Player) -> bool {
         let width = self.base_texture_atlas.width;
         let height = self.base_texture_atlas.height;
-        let y = screen_height() - height;
+        let y = SCREEN_HEIGHT - height;
 
         let player_x = player.position.x;
         let player_y = player.position.y;
@@ -87,7 +87,7 @@ impl Node for Base {
     fn draw(&mut self) {
         let width = self.base_texture_atlas.width;
         let height = self.base_texture_atlas.height;
-        let y = screen_height() - height;
+        let y = SCREEN_HEIGHT - height;
         let texture = &self.base_texture_atlas.texture;
 
         // Draw first base

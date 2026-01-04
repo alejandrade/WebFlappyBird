@@ -14,13 +14,15 @@ mod sound_effects;
 
 use macroquad::prelude::*;
 use crate::game_state::GameState;
+pub const SCREEN_WIDTH: f32 = 320.0;
+pub const SCREEN_HEIGHT: f32 = 568.0;
 
 fn window_conf() -> Conf {
     Conf {
         window_title: "Tiny Flappy Bird".to_owned(),
         window_width: 320,
         window_height: 568,
-        window_resizable: false, 
+        window_resizable: false,
         ..Default::default()
     }
 }

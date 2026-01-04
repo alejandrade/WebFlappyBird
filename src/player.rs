@@ -3,7 +3,7 @@ use macroquad::input::{is_key_pressed, is_mouse_button_pressed, KeyCode, MouseBu
 use macroquad::math::{vec2, Vec2};
 use macroquad::prelude::draw_texture_ex;
 use macroquad::texture::DrawTextureParams;
-use macroquad::window::{screen_height, screen_width};
+use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::bird_texture_atlas::BirdTextureAtlas;
 use crate::components::Node;
 
@@ -20,8 +20,8 @@ pub struct Player {
 impl Player {
     pub(crate) async fn new() -> Self {
         let bird_renderer = BirdTextureAtlas::new().await;
-        let x = screen_width() / 2.0 - bird_renderer.width / 2.0;
-        let y = screen_height() / 2.0 - bird_renderer.height / 2.0;
+        let x = SCREEN_WIDTH / 2.0 - bird_renderer.width / 2.0;
+        let y = SCREEN_HEIGHT / 2.0 - bird_renderer.height / 2.0;
 
 
         Self {

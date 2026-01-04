@@ -11,11 +11,9 @@ echo "🎨 Copying assets to frontend..."
 rm -rf frontend/static/assets
 cp -r assets frontend/static/
 
-echo "📥 Setting up gl.js..."
+echo "📥 Setting up mq_js_bundle.js..."
 cd frontend
-if [ ! -f static/gl.js ]; then
-    curl -sS https://raw.githubusercontent.com/not-fl3/miniquad/master/js/gl.js -o static/gl.js
-fi
+curl -sS https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js -o static/mq_js_bundle.js
 
 echo "📦 Installing dependencies..."
 npm install

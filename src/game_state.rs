@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
@@ -28,10 +29,9 @@ impl GameState {
         let background_texture_atlas = BackgroundTextureAtlas::new().await;
         let player = Player::new().await;
         let world = World::new(background_texture_atlas).await;
-        let mut music_player = MusicPlayer::new("assets/music", 2.0)
+        let music_player = MusicPlayer::new("assets/music", 2.0)
             .await
             .expect("Failed to load music");
-        music_player.play();
         let sound_effects = SoundEffects::new().await;
         let gameover_texture = load_texture("assets/sprites/gameover.png")
             .await
@@ -66,6 +66,7 @@ impl GameState {
     }
 
     pub fn update(&mut self) {
+        self.music_player.play();
         self.music_player.update();
         self.handle_input();
         let dt = get_frame_time();
@@ -111,8 +112,8 @@ impl GameState {
         match self.scene {
             GameScene::StartScreen => {
                 self.world.draw();
-                let msg_x = (screen_width() - message.width()) / 2.0;
-                let msg_y = (screen_height() - message.height()) / 2.0 - 50.0;
+                let msg_x = (SCREEN_WIDTH - message.width()) / 2.0;
+                let msg_y = (SCREEN_HEIGHT - message.height()) / 2.0 - 50.0;
                 draw_texture(message, msg_x, msg_y, WHITE);
             }
             GameScene::Playing => {
@@ -126,8 +127,8 @@ impl GameState {
                 self.player.draw();
 
                 // Draw gameover image centered
-                let gameover_x = (screen_width() - self.gameover_texture.width()) / 2.0;
-                let gameover_y = (screen_height() - self.gameover_texture.height()) / 2.0 - 100.0;
+                let gameover_x = (SCREEN_WIDTH - self.gameover_texture.width()) / 2.0;
+                let gameover_y = (SCREEN_HEIGHT - self.gameover_texture.height()) / 2.0 - 100.0;
                 draw_texture(&self.gameover_texture, gameover_x, gameover_y, WHITE);
 
                 // Draw instructions (two lines)
@@ -140,8 +141,8 @@ impl GameState {
                 let line1_dimensions = measure_text(line1, None, font_size as u16, 1.0);
                 let line2_dimensions = measure_text(line2, None, font_size as u16, 1.0);
 
-                let line1_x = (screen_width() - line1_dimensions.width) / 2.0;
-                let line2_x = (screen_width() - line2_dimensions.width) / 2.0;
+                let line1_x = (SCREEN_WIDTH - line1_dimensions.width) / 2.0;
+                let line2_x = (SCREEN_WIDTH - line2_dimensions.width) / 2.0;
                 let start_y = gameover_y + self.gameover_texture.height() + 50.0;
 
                 draw_text(line1, line1_x, start_y, font_size, WHITE);

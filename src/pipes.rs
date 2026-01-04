@@ -2,7 +2,7 @@ use std::rc::Rc;
 use macroquad::color::WHITE;
 use macroquad::math::{vec2, Vec2};
 use macroquad::prelude::{draw_texture_ex, DrawTextureParams};
-use macroquad::window::{screen_height, screen_width};
+use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::components::Node;
 use crate::pipe_texture_atlas::{PipeColor, PipeTextureAtlas};
 use crate::player::Player;
@@ -46,7 +46,7 @@ impl Pipe {
                score: u32,) -> Pipe {
 
         // Spawn off-screen to the right
-        let x = screen_width();
+        let x = SCREEN_WIDTH;
         let y = 0.0;
 
         Pipe {
@@ -79,7 +79,7 @@ impl Pipe {
     }
 
     fn get_pipe_y_and_height(&self) -> (f32, f32) {
-        let screen_h = screen_height();
+        let screen_h = SCREEN_HEIGHT;
         let playable_height = screen_h - self.base_height;
         let gap_size = GAP_SIZE;
 

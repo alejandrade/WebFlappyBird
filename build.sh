@@ -14,9 +14,7 @@ cp -r assets frontend/static/
 
 echo "📥 Setting up mq_js_bundle.js..."
 cd frontend
-if [ ! -f static/mq_js_bundle.js ]; then
-    curl -sS https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js -o static/mq_js_bundle.js
-fi
+curl -sS https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js -o static/mq_js_bundle.js
 
 echo "🎨 Building frontend..."
 npm install

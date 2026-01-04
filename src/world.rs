@@ -3,7 +3,7 @@ use macroquad::color::WHITE;
 use macroquad::prelude::vec2;
 use macroquad::rand::gen_range;
 use macroquad::texture::{draw_texture_ex, DrawTextureParams};
-use macroquad::window::{screen_height, screen_width};
+use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
 use crate::base::Base;
 use crate::base_texture_atlas::BaseTextureAtlas;
@@ -49,7 +49,7 @@ impl World {
 
     pub fn touched(&self, player: &Player) -> bool {
         // Check if player flew off screen (top or bottom)
-        let off_screen = player.position.y < 0.0 || player.position.y > screen_height();
+        let off_screen = player.position.y < 0.0 || player.position.y > SCREEN_HEIGHT;
 
         self.pipes.iter().any(|(pipe1, pipe2)| {
             pipe1.touched(player) || pipe2.touched(player)
@@ -96,7 +96,7 @@ impl World {
 
         let digit_width = self.number_texture_atlas.width;
         let total_width = digits.len() as f32 * digit_width;
-        let screen_w = screen_width();
+        let screen_w = SCREEN_WIDTH;
         let start_x = (screen_w - total_width) / 2.0;
         let y = 50.0;
 
@@ -175,7 +175,7 @@ impl Node for World {
             0.0,
             WHITE,
             DrawTextureParams {
-                dest_size: Some(vec2(screen_width(), screen_height())),
+                dest_size: Some(vec2(SCREEN_WIDTH, SCREEN_HEIGHT)),
                 ..Default::default()
             },
         );
