@@ -26,13 +26,14 @@ pub struct World {
     pub last_pipe_location_index: usize,
 }
 
+pub const VELOCITY: u16 = 130;
 
 impl World {
     pub async fn new(background_texture_atlas: BackgroundTextureAtlas) -> Self {
         let pipe_texture_atlas = Rc::new(PipeTextureAtlas::new().await);
         let base_texture_atlas = BaseTextureAtlas::new().await;
         let number_texture_atlas = NumberTextureAtlas::new().await;
-        let base = Base::new(base_texture_atlas, 170).await;
+        let base = Base::new(base_texture_atlas, VELOCITY).await;
         World {
             score: 0,
             timer: 0.0,
@@ -41,7 +42,7 @@ impl World {
             pipes: Vec::new(),
             pipe_spawn_time: 2.0,
             number_texture_atlas,
-            velocity: 170,
+            velocity: VELOCITY,
             base,
             last_pipe_location_index: 4,  // Start at Mid
         }
