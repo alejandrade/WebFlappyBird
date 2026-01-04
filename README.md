@@ -2,7 +2,7 @@
 
 A clean Flappy Bird clone built in **Rust** with WebAssembly support. Play it natively on desktop or in your browser!
 
-**[Play Online](https://alejandrade.github.io/WebFlappyBird/)** | **[☕ Support the Project](https://ko-fi.com/alejandrade)**
+**[Play Online](https://alejandrade.github.io/WebFlappyBird/)** 
 
 ##  How to Play
 
@@ -99,10 +99,6 @@ WebFlappyBird/
 │   └── src/               # SvelteKit source
 └── assets/                # Game assets (used for native build)
 ```
-
-## ☕ Support
-
-If you enjoy this game, consider [buying me a coffee](https://ko-fi.com/alejandrade)! Your support helps me create more open-source projects.
 
 ## License
 
