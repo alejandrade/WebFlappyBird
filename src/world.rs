@@ -32,7 +32,7 @@ impl World {
         let pipe_texture_atlas = Rc::new(PipeTextureAtlas::new().await);
         let base_texture_atlas = BaseTextureAtlas::new().await;
         let number_texture_atlas = NumberTextureAtlas::new().await;
-        let base = Base::new(base_texture_atlas, 200).await;
+        let base = Base::new(base_texture_atlas, 170).await;
         World {
             score: 0,
             timer: 0.0,
@@ -41,7 +41,7 @@ impl World {
             pipes: Vec::new(),
             pipe_spawn_time: 2.0,
             number_texture_atlas,
-            velocity: 200,
+            velocity: 170,
             base,
             last_pipe_location_index: 4,  // Start at Mid
         }
