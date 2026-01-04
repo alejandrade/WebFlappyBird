@@ -59,7 +59,6 @@ impl GameState {
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
                     self.scene = GameScene::StartScreen;
                     self.music_player.next();
-                    self.music_player.play();
                 }
             }
         }

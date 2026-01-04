@@ -77,8 +77,7 @@ impl MusicPlayer {
             return;
         }
 
-        // Start fade out, no next song
-        self.fade_state = FadeState::FadingOut { next_index: None };
+
         self.fade_start_time = get_time();
     }
 
@@ -97,25 +96,40 @@ impl MusicPlayer {
             };
             self.fade_start_time = get_time();
         } else {
-            // If not playing, just move to next
-            self.current_index = next_idx;
+            // If not playing, just start the next song
+            self.start_next_song(next_idx);
         }
     }
 
-    fn start_next_song(&mut self, next_idx: usize) {
+    fn start_next_song(&mut self, new_song_idx: usize) {
         stop_sound(&self.sounds[self.current_index]);
-        self.current_index = next_idx;
+        let previous_current_index = self.current_index; // Store the index of the song that just ended
+        self.current_index = new_song_idx; // Update to the new song's index
 
-        play_sound(
-            &self.sounds[self.current_index],
-            macroquad::audio::PlaySoundParams {
-                looped: true,
-                volume: 0.0,
-            },
-        );
+        let is_wrap_around_to_first = new_song_idx == 0 && previous_current_index == self.sounds.len() - 1;
 
-        self.fade_state = FadeState::FadingIn;
-        self.fade_start_time = get_time();
+        if is_wrap_around_to_first {
+            // "Go back to fast" - play immediately at full volume, no fade-in
+            play_sound(
+                &self.sounds[self.current_index],
+                macroquad::audio::PlaySoundParams {
+                    looped: true,
+                    volume: 1.0,
+                },
+            );
+            self.fade_state = FadeState::None; // No fade in needed
+        } else {
+            // Normal fade-in
+            play_sound(
+                &self.sounds[self.current_index],
+                macroquad::audio::PlaySoundParams {
+                    looped: true,
+                    volume: 0.0, // Start from 0 for fade-in
+                },
+            );
+            self.fade_state = FadeState::FadingIn;
+            self.fade_start_time = get_time();
+        }
     }
 
     /// Call this every frame in your game loop to handle fades
@@ -130,11 +144,14 @@ impl MusicPlayer {
                 let fade_progress = (get_time() - self.fade_start_time) / self.fade_duration;
                 if fade_progress >= 1.0 {
                     // Fade out complete
+                    println!("[MUSIC] Fade out complete, next_index={:?}", next_index);
                     if let Some(next_idx) = *next_index {
                         // Start next song
+                        println!("[MUSIC] Fade out complete, starting next song {}", next_idx);
                         self.start_next_song(next_idx);
                     } else {
                         // Just stop
+                        println!("[MUSIC] next_index is None, stopping playback");
                         stop_sound(&self.sounds[self.current_index]);
                         self.is_playing = false;
                         self.fade_state = FadeState::None;
