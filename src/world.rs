@@ -1,9 +1,3 @@
-use std::rc::Rc;
-use macroquad::color::WHITE;
-use macroquad::prelude::vec2;
-use macroquad::rand::gen_range;
-use macroquad::texture::{draw_texture_ex, DrawTextureParams};
-use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
 use crate::base::Base;
 use crate::base_texture_atlas::BaseTextureAtlas;
@@ -12,6 +6,12 @@ use crate::number_texture_atlas::NumberTextureAtlas;
 use crate::pipe_texture_atlas::PipeTextureAtlas;
 use crate::pipes::{Pipe, PipeLocation};
 use crate::player::Player;
+use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use macroquad::color::WHITE;
+use macroquad::prelude::vec2;
+use macroquad::rand::gen_range;
+use macroquad::texture::{DrawTextureParams, draw_texture_ex};
+use std::rc::Rc;
 
 pub struct World {
     pub score: u32,
@@ -44,7 +44,7 @@ impl World {
             number_texture_atlas,
             velocity: VELOCITY,
             base,
-            last_pipe_location_index: 4,  // Start at Mid
+            last_pipe_location_index: 4, // Start at Mid
         }
     }
 
@@ -52,9 +52,11 @@ impl World {
         // Check if player flew off screen (top or bottom)
         let off_screen = player.position.y < 0.0 || player.position.y > SCREEN_HEIGHT;
 
-        self.pipes.iter().any(|(pipe1, pipe2)| {
-            pipe1.touched(player) || pipe2.touched(player)
-        }) || self.base.touched(player) || off_screen
+        self.pipes
+            .iter()
+            .any(|(pipe1, pipe2)| pipe1.touched(player) || pipe2.touched(player))
+            || self.base.touched(player)
+            || off_screen
     }
 
     pub fn end(&mut self) {
@@ -143,31 +145,44 @@ impl Node for World {
 
             self.last_pipe_location_index = r;
             let base_height = self.base.height;
-            let score= self.score;
+            let score = self.score;
             self.pipes.push((
-                Pipe::new(Rc::clone(&self.pipe_texture_atlas),false, self.velocity, location.clone(), base_height, score),
-                Pipe::new(Rc::clone(&self.pipe_texture_atlas), true, self.velocity, location, base_height, score)
+                Pipe::new(
+                    Rc::clone(&self.pipe_texture_atlas),
+                    false,
+                    self.velocity,
+                    location.clone(),
+                    base_height,
+                    score,
+                ),
+                Pipe::new(
+                    Rc::clone(&self.pipe_texture_atlas),
+                    true,
+                    self.velocity,
+                    location,
+                    base_height,
+                    score,
+                ),
             ));
             self.timer = 0.0;
         }
 
-        self.pipes.iter_mut()
-            .for_each(|(pipe1, pipe2)| {
+        self.pipes.iter_mut().for_each(|(pipe1, pipe2)| {
             pipe1.update(dt);
             pipe2.update(dt);
         });
         self.base.update(dt);
 
         self.pipes.retain(|(pipe1, _)| !pipe1.is_off_screen());
-
-
     }
 
     fn draw(&mut self) {
         let background_texture = if (self.score / 10) % 2 != 0 {
-            self.background_texture_atlas.get_texture_2d(BackgroundType::Night)
+            self.background_texture_atlas
+                .get_texture_2d(BackgroundType::Night)
         } else {
-            self.background_texture_atlas.get_texture_2d(BackgroundType::Day)
+            self.background_texture_atlas
+                .get_texture_2d(BackgroundType::Day)
         };
 
         draw_texture_ex(
@@ -181,7 +196,6 @@ impl Node for World {
             },
         );
 
-
         self.pipes.iter_mut().for_each(|(pipe1, pipe2)| {
             pipe1.draw();
             pipe2.draw();
@@ -194,6 +208,4 @@ impl Node for World {
             self.draw_score();
         }
     }
-
-
 }

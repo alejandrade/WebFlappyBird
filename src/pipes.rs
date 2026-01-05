@@ -1,11 +1,11 @@
-use std::rc::Rc;
-use macroquad::color::WHITE;
-use macroquad::math::{vec2, Vec2};
-use macroquad::prelude::{draw_texture_ex, DrawTextureParams};
-use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::components::Node;
 use crate::pipe_texture_atlas::{PipeColor, PipeTextureAtlas};
 use crate::player::Player;
+use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use macroquad::color::WHITE;
+use macroquad::math::{Vec2, vec2};
+use macroquad::prelude::{DrawTextureParams, draw_texture_ex};
+use std::rc::Rc;
 
 #[derive(Clone, Debug)]
 pub enum PipeLocation {
@@ -21,7 +21,6 @@ pub enum PipeLocation {
     Lowest,
 }
 
-
 pub struct Pipe {
     pub pipe_texture_atlas: Rc<PipeTextureAtlas>,
     pub velocity: u16,
@@ -34,17 +33,17 @@ pub struct Pipe {
     pub passed: bool,
 }
 
-
 const GAP_SIZE: f32 = 140.0;
 
 impl Pipe {
-    pub fn new(pipe_texture_atlas: Rc<PipeTextureAtlas>,
-               reflected: bool,
-               velocity: u16,
-               pipe_location: PipeLocation,
-               base_height: f32,
-               score: u32,) -> Pipe {
-
+    pub fn new(
+        pipe_texture_atlas: Rc<PipeTextureAtlas>,
+        reflected: bool,
+        velocity: u16,
+        pipe_location: PipeLocation,
+        base_height: f32,
+        score: u32,
+    ) -> Pipe {
         // Spawn off-screen to the right
         let x = SCREEN_WIDTH;
         let y = 0.0;

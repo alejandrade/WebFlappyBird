@@ -1,11 +1,11 @@
-use macroquad::color::WHITE;
-use macroquad::input::{is_key_pressed, is_mouse_button_pressed, KeyCode, MouseButton};
-use macroquad::math::{vec2, Vec2};
-use macroquad::prelude::draw_texture_ex;
-use macroquad::texture::DrawTextureParams;
-use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::bird_texture_atlas::BirdTextureAtlas;
 use crate::components::Node;
+use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use macroquad::color::WHITE;
+use macroquad::input::{KeyCode, MouseButton, is_key_pressed, is_mouse_button_pressed};
+use macroquad::math::{Vec2, vec2};
+use macroquad::prelude::draw_texture_ex;
+use macroquad::texture::DrawTextureParams;
 
 pub struct Player {
     pub alive: bool,
@@ -23,7 +23,6 @@ impl Player {
         let x = SCREEN_WIDTH / 2.0 - bird_renderer.width / 2.0;
         let y = SCREEN_HEIGHT / 2.0 - bird_renderer.height / 2.0;
 
-
         Self {
             alive: true,
             position: Vec2::new(x, y),
@@ -35,7 +34,7 @@ impl Player {
         }
     }
 
-    pub fn dead(&mut self)  {
+    pub fn dead(&mut self) {
         if self.alive {
             self.vel.x = -50.0;
             self.vel.y = self.jump_force;
@@ -51,7 +50,6 @@ impl Player {
     }
 }
 impl Node for Player {
-
     fn update(&mut self, dt: f32) {
         let gravity = 800.0;
         let max_fall_speed = 1500.0;
@@ -61,7 +59,10 @@ impl Node for Player {
 
         // Cap velocities to prevent overflow
         self.vel.y = self.vel.y.clamp(-max_fall_speed, max_fall_speed);
-        self.vel.x = self.vel.x.clamp(-max_horizontal_speed, max_horizontal_speed);
+        self.vel.x = self
+            .vel
+            .x
+            .clamp(-max_horizontal_speed, max_horizontal_speed);
 
         self.position.y += self.vel.y * dt;
         self.position.x += self.vel.x * dt;
@@ -69,14 +70,13 @@ impl Node for Player {
         if self.alive {
             // Only allow jumping when alive
             if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-
                 self.vel.y = if self.vel.y < 0.0 {
                     self.jump_force - 100.0
-                }else {
+                } else {
                     self.jump_force
                 };
 
-                println!("{}", self.vel.y )
+                println!("{}", self.vel.y)
             }
         } else {
             self.rotation -= 1.5 * dt;

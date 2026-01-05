@@ -1,4 +1,4 @@
-use macroquad::audio::{load_sound, play_sound, set_sound_volume, stop_sound, Sound};
+use macroquad::audio::{Sound, load_sound, play_sound, set_sound_volume, stop_sound};
 use macroquad::time::get_time;
 
 enum FadeState {
@@ -77,7 +77,6 @@ impl MusicPlayer {
             return;
         }
 
-
         self.fade_start_time = get_time();
     }
 
@@ -106,7 +105,8 @@ impl MusicPlayer {
         let previous_current_index = self.current_index; // Store the index of the song that just ended
         self.current_index = new_song_idx; // Update to the new song's index
 
-        let is_wrap_around_to_first = new_song_idx == 0 && previous_current_index == self.sounds.len() - 1;
+        let is_wrap_around_to_first =
+            new_song_idx == 0 && previous_current_index == self.sounds.len() - 1;
 
         if is_wrap_around_to_first {
             // "Go back to fast" - play immediately at full volume, no fade-in
@@ -179,5 +179,4 @@ impl MusicPlayer {
             }
         }
     }
-
 }

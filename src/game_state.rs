@@ -1,11 +1,11 @@
-use macroquad::prelude::*;
-use crate::{SCREEN_WIDTH, SCREEN_HEIGHT};
 use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
 use crate::player::Player;
 use crate::sound_effects::SoundEffects;
 use crate::world::World;
+use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
+use macroquad::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GameScene {
@@ -25,7 +25,6 @@ pub struct GameState {
 
 impl GameState {
     pub async fn new() -> Self {
-
         let background_texture_atlas = BackgroundTextureAtlas::new().await;
         let player = Player::new().await;
         let world = World::new(background_texture_atlas).await;
@@ -42,7 +41,7 @@ impl GameState {
             sound_effects,
             player,
             world,
-            gameover_texture
+            gameover_texture,
         }
     }
 
@@ -53,8 +52,7 @@ impl GameState {
                     self.scene = GameScene::Playing;
                 }
             }
-            GameScene::Playing => {
-            }
+            GameScene::Playing => {}
             GameScene::GameOver => {
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
                     self.scene = GameScene::StartScreen;
@@ -69,7 +67,7 @@ impl GameState {
         self.music_player.update();
         self.handle_input();
         let dt = get_frame_time();
-        let player  = &mut self.player;
+        let player = &mut self.player;
         let world = &mut self.world;
 
         match self.scene {
@@ -78,7 +76,6 @@ impl GameState {
                 world.restart();
             }
             GameScene::Playing => {
-
                 player.update(dt);
                 world.update(dt);
 
@@ -101,7 +98,6 @@ impl GameState {
                 }
             }
             GameScene::GameOver => {
-                
                 player.update(dt);
             }
         }
@@ -118,7 +114,6 @@ impl GameState {
             GameScene::Playing => {
                 self.world.draw();
                 self.player.draw();
-
             }
             GameScene::GameOver => {
                 // Draw game over screen
@@ -149,5 +144,4 @@ impl GameState {
             }
         }
     }
-
 }

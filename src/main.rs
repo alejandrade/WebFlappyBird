@@ -1,19 +1,19 @@
-mod music_player;
-mod game_state;
-mod player;
-mod components;
-mod bird_texture_atlas;
-mod world;
 mod background_texture_atlas;
-mod pipe_texture_atlas;
-mod base_texture_atlas;
-mod pipes;
-mod number_texture_atlas;
 mod base;
+mod base_texture_atlas;
+mod bird_texture_atlas;
+mod components;
+mod game_state;
+mod music_player;
+mod number_texture_atlas;
+mod pipe_texture_atlas;
+mod pipes;
+mod player;
 mod sound_effects;
+mod world;
 
-use macroquad::prelude::*;
 use crate::game_state::GameState;
+use macroquad::prelude::*;
 pub const SCREEN_WIDTH: f32 = 320.0;
 pub const SCREEN_HEIGHT: f32 = 568.0;
 
@@ -60,7 +60,6 @@ async fn main() {
         .await
         .expect("Failed to load message");
     message.set_filter(FilterMode::Nearest);
-
 
     let mut game_state = GameState::new().await;
 

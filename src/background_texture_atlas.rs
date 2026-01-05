@@ -1,4 +1,4 @@
-use macroquad::texture::{load_texture, FilterMode, Texture2D};
+use macroquad::texture::{FilterMode, Texture2D, load_texture};
 
 pub enum BackgroundType {
     Day,
@@ -43,9 +43,7 @@ impl BackgroundTextureAtlas {
 
     async fn get_texture(background_type: &str) -> Texture2D {
         let path = format!("assets/sprites/background-{}.png", background_type);
-        load_texture(&path)
-            .await
-            .expect("Failed to load texture")
+        load_texture(&path).await.expect("Failed to load texture")
     }
 
     pub fn get_texture_2d(&self, background_type: BackgroundType) -> &Texture2D {

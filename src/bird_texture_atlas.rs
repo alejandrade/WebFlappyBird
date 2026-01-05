@@ -1,5 +1,5 @@
 use macroquad::rand::gen_range;
-use macroquad::texture::{load_texture, FilterMode, Texture2D};
+use macroquad::texture::{FilterMode, Texture2D, load_texture};
 
 pub enum BirdColor {
     YellowBird,
@@ -12,8 +12,8 @@ impl BirdColor {
     pub fn as_str(&self) -> &'static str {
         match self {
             BirdColor::YellowBird => "yellowbird",
-            BirdColor::BlueBird   => "bluebird",
-            BirdColor::RedBird    => "redbird",
+            BirdColor::BlueBird => "bluebird",
+            BirdColor::RedBird => "redbird",
         }
     }
 
@@ -30,16 +30,14 @@ impl BirdColor {
 pub struct BirdSprites {
     pub downflap_texture: Texture2D,
     pub midflap_texture: Texture2D,
-    pub upflap_texture: Texture2D
+    pub upflap_texture: Texture2D,
 }
-
 
 pub struct BirdTextureAtlas {
     pub bird_sprites: BirdSprites,
     pub width: f32,
-    pub height: f32
+    pub height: f32,
 }
-
 
 impl BirdTextureAtlas {
     pub async fn new() -> BirdTextureAtlas {
@@ -61,17 +59,15 @@ impl BirdTextureAtlas {
             bird_sprites: BirdSprites {
                 downflap_texture: down,
                 midflap_texture: mid,
-                upflap_texture: up
+                upflap_texture: up,
             },
             width: w,
-            height: h
+            height: h,
         }
     }
 
     pub async fn get_texture(bird_color: &str, text_type: &str) -> Texture2D {
         let path = format!("assets/sprites/{}-{}.png", bird_color, text_type);
-        load_texture(&path)
-            .await
-            .expect("Failed to load texture")
+        load_texture(&path).await.expect("Failed to load texture")
     }
 }

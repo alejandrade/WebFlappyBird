@@ -1,10 +1,10 @@
-use macroquad::color::WHITE;
-use macroquad::math::vec2;
-use macroquad::prelude::{draw_texture_ex, DrawTextureParams};
+use crate::SCREEN_HEIGHT;
 use crate::base_texture_atlas::BaseTextureAtlas;
 use crate::components::Node;
 use crate::player::Player;
-use crate::SCREEN_HEIGHT;
+use macroquad::color::WHITE;
+use macroquad::math::vec2;
+use macroquad::prelude::{DrawTextureParams, draw_texture_ex};
 
 pub struct Base {
     pub base_texture_atlas: BaseTextureAtlas,
@@ -15,10 +15,8 @@ pub struct Base {
     pub stopped: bool,
 }
 
-
 impl Base {
-    pub async fn new(base_texture_atlas: BaseTextureAtlas,
-                     velocity: u16) -> Base {
+    pub async fn new(base_texture_atlas: BaseTextureAtlas, velocity: u16) -> Base {
         let height = base_texture_atlas.height;
         let width = base_texture_atlas.width;
         Base {

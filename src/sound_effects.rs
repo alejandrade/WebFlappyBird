@@ -1,4 +1,4 @@
-use macroquad::audio::{load_sound, play_sound_once, Sound};
+use macroquad::audio::{Sound, load_sound, play_sound_once};
 
 pub struct SoundEffects {
     pub death_sound: Sound,

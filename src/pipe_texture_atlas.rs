@@ -1,4 +1,4 @@
-use macroquad::texture::{load_texture, FilterMode, Texture2D};
+use macroquad::texture::{FilterMode, Texture2D, load_texture};
 
 pub enum PipeColor {
     Green,
@@ -50,9 +50,7 @@ impl PipeTextureAtlas {
 
     pub async fn get_texture(pipe_color: &str) -> Texture2D {
         let path = format!("assets/sprites/pipe-{}.png", pipe_color);
-        load_texture(&path)
-            .await
-            .expect("Failed to load texture")
+        load_texture(&path).await.expect("Failed to load texture")
     }
 
     pub fn get_texture_2d(&self, pipe_color: PipeColor) -> &Texture2D {

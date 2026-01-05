@@ -1,4 +1,4 @@
-use macroquad::texture::{load_texture, FilterMode, Texture2D};
+use macroquad::texture::{FilterMode, Texture2D, load_texture};
 
 pub struct BaseTextureAtlas {
     pub texture: Texture2D,
@@ -23,8 +23,6 @@ impl BaseTextureAtlas {
 
     pub async fn get_texture() -> Texture2D {
         let path = "assets/sprites/base.png";
-        load_texture(path)
-            .await
-            .expect("Failed to load texture")
+        load_texture(path).await.expect("Failed to load texture")
     }
 }

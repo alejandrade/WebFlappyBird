@@ -1,4 +1,4 @@
-use macroquad::texture::{load_texture, FilterMode, Texture2D};
+use macroquad::texture::{FilterMode, Texture2D, load_texture};
 
 pub struct NumberSprites {
     pub digits: [Texture2D; 10],
@@ -37,8 +37,6 @@ impl NumberTextureAtlas {
 
     pub async fn get_texture(digit: usize) -> Texture2D {
         let path = format!("assets/sprites/{}.png", digit);
-        load_texture(&path)
-            .await
-            .expect("Failed to load texture")
+        load_texture(&path).await.expect("Failed to load texture")
     }
 }
