@@ -1,4 +1,4 @@
-use crate::bird_texture_atlas::BirdTextureAtlas;
+use crate::assets::Assets;
 use crate::components::Node;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use macroquad::color::WHITE;
@@ -12,25 +12,26 @@ pub struct Player {
     pub position: Vec2,
     pub jump_force: f32,
     pub vel: Vec2,
-    pub bird_renderer: BirdTextureAtlas,
     pub start_position: Vec2,
     pub rotation: f32,
+    pub width: f32,
+    pub height: f32,
 }
 
 impl Player {
-    pub(crate) async fn new() -> Self {
-        let bird_renderer = BirdTextureAtlas::new().await;
-        let x = SCREEN_WIDTH / 2.0 - bird_renderer.width / 2.0;
-        let y = SCREEN_HEIGHT / 2.0 - bird_renderer.height / 2.0;
+    pub(crate) fn new(assets: &Assets) -> Self {
+        let x = SCREEN_WIDTH / 2.0 - assets.bird_renderer.width / 2.0;
+        let y = SCREEN_HEIGHT / 2.0 - assets.bird_renderer.height / 2.0;
 
         Self {
             alive: true,
             position: Vec2::new(x, y),
             vel: Vec2::new(0.0, 0.0),
             jump_force: -300.0,
-            bird_renderer,
             start_position: Vec2::new(x, y),
             rotation: 0.0,
+            width: assets.bird_renderer.width,
+            height: assets.bird_renderer.height,
         }
     }
 
@@ -40,13 +41,6 @@ impl Player {
             self.vel.y = self.jump_force;
         }
         self.alive = false;
-    }
-
-    pub fn restart(&mut self) {
-        self.alive = true;
-        self.position = self.start_position;
-        self.vel = Vec2::new(0.0, 0.0);
-        self.rotation = 0.0;
     }
 }
 impl Node for Player {
@@ -83,13 +77,13 @@ impl Node for Player {
         }
     }
 
-    fn draw(&mut self) {
+    fn draw(&mut self, assets: &Assets) {
         let (texture, rotation) = if self.vel.y < -50.0 {
-            (&self.bird_renderer.bird_sprites.downflap_texture, 25.0)
+            (&assets.bird_renderer.bird_sprites.downflap_texture, 25.0)
         } else if self.vel.y > 50.0 {
-            (&self.bird_renderer.bird_sprites.upflap_texture, -25.0)
+            (&assets.bird_renderer.bird_sprites.upflap_texture, -25.0)
         } else {
-            (&self.bird_renderer.bird_sprites.midflap_texture, 0.0)
+            (&assets.bird_renderer.bird_sprites.midflap_texture, 0.0)
         };
         self.rotation = rotation;
 

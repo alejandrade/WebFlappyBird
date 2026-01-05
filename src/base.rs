@@ -1,4 +1,5 @@
 use crate::SCREEN_HEIGHT;
+use crate::assets::Assets;
 use crate::base_texture_atlas::BaseTextureAtlas;
 use crate::components::Node;
 use crate::player::Player;
@@ -44,8 +45,8 @@ impl Base {
 
         let player_x = player.position.x;
         let player_y = player.position.y;
-        let player_width = player.bird_renderer.width;
-        let player_height = player.bird_renderer.height;
+        let player_width = player.width;
+        let player_height = player.height;
 
         // Check collision with first base
         let collision1 = self.x1 < player_x + player_width
@@ -82,7 +83,7 @@ impl Node for Base {
         }
     }
 
-    fn draw(&mut self) {
+    fn draw(&mut self, _assets: &Assets) {
         let width = self.base_texture_atlas.width;
         let height = self.base_texture_atlas.height;
         let y = SCREEN_HEIGHT - height;

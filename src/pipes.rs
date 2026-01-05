@@ -1,3 +1,4 @@
+use crate::assets::Assets;
 use crate::components::Node;
 use crate::pipe_texture_atlas::{PipeColor, PipeTextureAtlas};
 use crate::player::Player;
@@ -122,8 +123,8 @@ impl Pipe {
 
         let player_x = player.position.x;
         let player_y = player.position.y;
-        let player_width = player.bird_renderer.width;
-        let player_height = player.bird_renderer.height;
+        let player_width = player.width;
+        let player_height = player.height;
 
         // AABB collision detection
         pipe_x < player_x + player_width
@@ -141,7 +142,7 @@ impl Node for Pipe {
         }
     }
 
-    fn draw(&mut self) {
+    fn draw(&mut self, _assets: &Assets) {
         let (y, pipe_height) = self.get_pipe_y_and_height();
         let pipe_width = self.pipe_texture_atlas.width;
 

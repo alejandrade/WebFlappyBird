@@ -1,3 +1,4 @@
+use crate::assets::Assets;
 use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
 use crate::base::Base;
 use crate::base_texture_atlas::BaseTextureAtlas;
@@ -176,7 +177,7 @@ impl Node for World {
         self.pipes.retain(|(pipe1, _)| !pipe1.is_off_screen());
     }
 
-    fn draw(&mut self) {
+    fn draw(&mut self, assets: &Assets) {
         let background_texture = if (self.score / 10) % 2 != 0 {
             self.background_texture_atlas
                 .get_texture_2d(BackgroundType::Night)
@@ -197,11 +198,11 @@ impl Node for World {
         );
 
         self.pipes.iter_mut().for_each(|(pipe1, pipe2)| {
-            pipe1.draw();
-            pipe2.draw();
+            pipe1.draw(&assets);
+            pipe2.draw(&assets);
         });
 
-        self.base.draw();
+        self.base.draw(&assets);
 
         // Draw score if greater than 0
         if self.score > 0 {

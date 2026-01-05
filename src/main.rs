@@ -67,7 +67,7 @@ async fn main() {
 
     loop {
         clear_background(BLACK);
-        game_state = game_state.update();
+        game_state = game_state.update(&assets);
         game_state.draw(&message, &assets);
         next_frame().await
     }

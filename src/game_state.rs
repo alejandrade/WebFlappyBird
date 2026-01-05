@@ -18,7 +18,6 @@ pub struct StartScreenState {
     music_player: MusicPlayer,
     sound_effects: SoundEffects,
     world: World,
-    player: Player,
 }
 pub struct PlayingState {
     music_player: MusicPlayer,
@@ -36,7 +35,6 @@ pub struct GameOverState {
 impl GameState {
     pub async fn new() -> Self {
         let background_texture_atlas = BackgroundTextureAtlas::new().await;
-        let player = Player::new().await;
         let world = World::new(background_texture_atlas).await;
         let music_player = MusicPlayer::new("assets/music", 2.0)
             .await
@@ -45,30 +43,26 @@ impl GameState {
         GameState::StartScreen(StartScreenState {
             music_player,
             sound_effects,
-            player,
             world,
         })
     }
 
-    pub fn update(self) -> Self {
+    pub fn update(self, assets: &Assets) -> Self {
         match self {
             GameState::StartScreen(mut state) => {
                 state.music_player.play();
                 state.music_player.update();
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
+                    let world = &mut state.world;
+                    world.restart();
                     return GameState::Playing(PlayingState {
                         music_player: state.music_player,
                         sound_effects: state.sound_effects,
-                        player: state.player,
+                        player: Player::new(assets),
                         world: state.world,
                     });
                 }
                 let dt = get_frame_time();
-                let player = &mut state.player;
-                let world = &mut state.world;
-
-                player.restart();
-                world.restart();
                 return GameState::StartScreen(state);
             }
             GameState::Playing(mut state) => {
@@ -113,14 +107,11 @@ impl GameState {
                     return GameState::StartScreen(StartScreenState {
                         music_player: state.music_player,
                         sound_effects: state.sound_effects,
-                        player: state.player,
                         world: state.world,
                     });
                 }
                 let dt = get_frame_time();
-                let player = &mut state.player;
                 let world = &mut state.world;
-                player.update(dt);
                 return GameState::GameOver(state);
             }
         }
@@ -129,19 +120,19 @@ impl GameState {
     pub fn draw(&mut self, message: &Texture2D, assets: &Assets) {
         match self {
             GameState::StartScreen(state) => {
-                state.world.draw();
+                state.world.draw(assets);
                 let msg_x = (SCREEN_WIDTH - message.width()) / 2.0;
                 let msg_y = (SCREEN_HEIGHT - message.height()) / 2.0 - 50.0;
                 draw_texture(message, msg_x, msg_y, WHITE);
             }
             GameState::Playing(state) => {
-                state.world.draw();
-                state.player.draw();
+                state.world.draw(assets);
+                state.player.draw(assets);
             }
             GameState::GameOver(state) => {
                 // Draw game over screen
-                state.world.draw();
-                state.player.draw();
+                state.world.draw(assets);
+                state.player.draw(assets);
 
                 // Draw gameover image centered
                 let gameover_x = (SCREEN_WIDTH - assets.gameover_texture.width()) / 2.0;
