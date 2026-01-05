@@ -7,15 +7,27 @@ use crate::world::World;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use macroquad::prelude::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GameScene {
-    StartScreen,
-    Playing,
-    GameOver,
+pub enum GameState {
+    StartScreen(StartScreenState),
+    Playing(PlayingState),
+    GameOver(GameOverState),
 }
 
-pub struct GameState {
-    scene: GameScene,
+pub struct StartScreenState {
+    music_player: MusicPlayer,
+    sound_effects: SoundEffects,
+    world: World,
+    player: Player,
+    gameover_texture: Texture2D,
+}
+pub struct PlayingState {
+    music_player: MusicPlayer,
+    sound_effects: SoundEffects,
+    world: World,
+    player: Player,
+    gameover_texture: Texture2D,
+}
+pub struct GameOverState {
     music_player: MusicPlayer,
     sound_effects: SoundEffects,
     world: World,
@@ -35,95 +47,115 @@ impl GameState {
         let gameover_texture = load_texture("assets/sprites/gameover.png")
             .await
             .expect("Failed to load gameover texture");
-        Self {
-            scene: GameScene::StartScreen,
+        GameState::StartScreen(StartScreenState {
             music_player,
             sound_effects,
             player,
             world,
             gameover_texture,
-        }
+        })
     }
 
-    fn handle_input(&mut self) {
-        match self.scene {
-            GameScene::StartScreen => {
+    pub fn update(self) -> Self {
+        match self {
+            GameState::StartScreen(mut state) => {
+                state.music_player.play();
+                state.music_player.update();
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-                    self.scene = GameScene::Playing;
+                    return GameState::Playing(PlayingState {
+                        music_player: state.music_player,
+                        sound_effects: state.sound_effects,
+                        player: state.player,
+                        world: state.world,
+                        gameover_texture: state.gameover_texture,
+                    });
                 }
-            }
-            GameScene::Playing => {}
-            GameScene::GameOver => {
-                if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-                    self.scene = GameScene::StartScreen;
-                    self.music_player.next();
-                }
-            }
-        }
-    }
+                let dt = get_frame_time();
+                let player = &mut state.player;
+                let world = &mut state.world;
 
-    pub fn update(&mut self) {
-        self.music_player.play();
-        self.music_player.update();
-        self.handle_input();
-        let dt = get_frame_time();
-        let player = &mut self.player;
-        let world = &mut self.world;
-
-        match self.scene {
-            GameScene::StartScreen => {
                 player.restart();
                 world.restart();
+                return GameState::StartScreen(state);
             }
-            GameScene::Playing => {
+            GameState::Playing(mut state) => {
+                state.music_player.play();
+                state.music_player.update();
+                let dt = get_frame_time();
+                let player = &mut state.player;
+                let world = &mut state.world;
+
                 player.update(dt);
                 world.update(dt);
 
                 // Play sound when score increases
                 if world.player_passed_pipes(player) {
-                    self.sound_effects.play_point();
+                    state.sound_effects.play_point();
                 }
 
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-                    self.sound_effects.play_wing();
+                    state.sound_effects.play_wing();
                 }
 
                 if world.touched(player) {
-                    self.sound_effects.play_hit();
+                    state.sound_effects.play_hit();
                     player.dead();
                     world.end();
-                    self.music_player.stop();
-                    self.scene = GameScene::GameOver;
-                    self.sound_effects.play_death();
+                    state.music_player.stop();
+                    state.sound_effects.play_death();
+                    return GameState::GameOver(GameOverState {
+                        music_player: state.music_player,
+                        sound_effects: state.sound_effects,
+                        world: state.world,
+                        player: state.player,
+                        gameover_texture: state.gameover_texture,
+                    });
                 }
+                return GameState::Playing(state);
             }
-            GameScene::GameOver => {
+            GameState::GameOver(mut state) => {
+                state.music_player.play();
+                state.music_player.update();
+                if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
+                    state.music_player.next();
+                    return GameState::StartScreen(StartScreenState {
+                        music_player: state.music_player,
+                        sound_effects: state.sound_effects,
+                        player: state.player,
+                        world: state.world,
+                        gameover_texture: state.gameover_texture,
+                    });
+                }
+                let dt = get_frame_time();
+                let player = &mut state.player;
+                let world = &mut state.world;
                 player.update(dt);
+                return GameState::GameOver(state);
             }
         }
     }
 
     pub fn draw(&mut self, message: &Texture2D) {
-        match self.scene {
-            GameScene::StartScreen => {
-                self.world.draw();
+        match self {
+            GameState::StartScreen(state) => {
+                state.world.draw();
                 let msg_x = (SCREEN_WIDTH - message.width()) / 2.0;
                 let msg_y = (SCREEN_HEIGHT - message.height()) / 2.0 - 50.0;
                 draw_texture(message, msg_x, msg_y, WHITE);
             }
-            GameScene::Playing => {
-                self.world.draw();
-                self.player.draw();
+            GameState::Playing(state) => {
+                state.world.draw();
+                state.player.draw();
             }
-            GameScene::GameOver => {
+            GameState::GameOver(state) => {
                 // Draw game over screen
-                self.world.draw();
-                self.player.draw();
+                state.world.draw();
+                state.player.draw();
 
                 // Draw gameover image centered
-                let gameover_x = (SCREEN_WIDTH - self.gameover_texture.width()) / 2.0;
-                let gameover_y = (SCREEN_HEIGHT - self.gameover_texture.height()) / 2.0 - 100.0;
-                draw_texture(&self.gameover_texture, gameover_x, gameover_y, WHITE);
+                let gameover_x = (SCREEN_WIDTH - state.gameover_texture.width()) / 2.0;
+                let gameover_y = (SCREEN_HEIGHT - state.gameover_texture.height()) / 2.0 - 100.0;
+                draw_texture(&state.gameover_texture, gameover_x, gameover_y, WHITE);
 
                 // Draw instructions (two lines)
                 let font_size = 20.0;
@@ -137,7 +169,7 @@ impl GameState {
 
                 let line1_x = (SCREEN_WIDTH - line1_dimensions.width) / 2.0;
                 let line2_x = (SCREEN_WIDTH - line2_dimensions.width) / 2.0;
-                let start_y = gameover_y + self.gameover_texture.height() + 50.0;
+                let start_y = gameover_y + state.gameover_texture.height() + 50.0;
 
                 draw_text(line1, line1_x, start_y, font_size, WHITE);
                 draw_text(line2, line2_x, start_y + line_spacing, font_size, WHITE);
