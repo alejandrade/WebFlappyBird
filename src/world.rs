@@ -1,10 +1,7 @@
 use crate::assets::Assets;
-use crate::background_texture_atlas::{BackgroundTextureAtlas, BackgroundType};
+use crate::background_texture_atlas::BackgroundType;
 use crate::base::Base;
-use crate::base_texture_atlas::BaseTextureAtlas;
 use crate::components::Node;
-use crate::number_texture_atlas::NumberTextureAtlas;
-use crate::pipe_texture_atlas::PipeTextureAtlas;
 use crate::pipes::{Pipe, PipeLocation};
 use crate::player::Player;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
@@ -17,11 +14,8 @@ use std::rc::Rc;
 pub struct World {
     pub score: u32,
     pub timer: f32,
-    pub background_texture_atlas: BackgroundTextureAtlas,
-    pub pipe_texture_atlas: Rc<PipeTextureAtlas>,
     pub pipes: Vec<(Pipe, Pipe)>,
     pub pipe_spawn_time: f32,
-    pub number_texture_atlas: NumberTextureAtlas,
     pub velocity: u16,
     pub base: Base,
     pub last_pipe_location_index: usize,
@@ -30,19 +24,13 @@ pub struct World {
 pub const VELOCITY: u16 = 130;
 
 impl World {
-    pub async fn new(background_texture_atlas: BackgroundTextureAtlas) -> Self {
-        let pipe_texture_atlas = Rc::new(PipeTextureAtlas::new().await);
-        let base_texture_atlas = BaseTextureAtlas::new().await;
-        let number_texture_atlas = NumberTextureAtlas::new().await;
-        let base = Base::new(base_texture_atlas, VELOCITY).await;
+    pub fn new(assets: &Assets) -> Self {
+        let base = Base::new(&assets.base_texture_atlas, VELOCITY);
         World {
             score: 0,
             timer: 0.0,
-            background_texture_atlas,
-            pipe_texture_atlas,
             pipes: Vec::new(),
             pipe_spawn_time: 2.0,
-            number_texture_atlas,
             velocity: VELOCITY,
             base,
             last_pipe_location_index: 4, // Start at Mid
@@ -91,21 +79,21 @@ impl World {
         passed
     }
 
-    fn draw_score(&self) {
+    fn draw_score(&self, assets: &Assets) {
         use macroquad::prelude::*;
 
         // Convert score to digits
         let score_str = self.score.to_string();
         let digits: Vec<u32> = score_str.chars().map(|c| c.to_digit(10).unwrap()).collect();
 
-        let digit_width = self.number_texture_atlas.width;
+        let digit_width = assets.number_texture_atlas.width;
         let total_width = digits.len() as f32 * digit_width;
         let screen_w = SCREEN_WIDTH;
         let start_x = (screen_w - total_width) / 2.0;
         let y = 50.0;
 
         for (i, &digit) in digits.iter().enumerate() {
-            let texture = &self.number_texture_atlas.number_sprites.digits[digit as usize];
+            let texture = &assets.number_texture_atlas.number_sprites.digits[digit as usize];
             let x = start_x + (i as f32 * digit_width);
 
             draw_texture_ex(
@@ -114,7 +102,7 @@ impl World {
                 y,
                 WHITE,
                 DrawTextureParams {
-                    dest_size: Some(vec2(digit_width, self.number_texture_atlas.height)),
+                    dest_size: Some(vec2(digit_width, assets.number_texture_atlas.height)),
                     ..Default::default()
                 },
             );
@@ -179,10 +167,10 @@ impl Node for World {
 
     fn draw(&mut self, assets: &Assets) {
         let background_texture = if (self.score / 10) % 2 != 0 {
-            self.background_texture_atlas
+            assets.background_texture_atlas
                 .get_texture_2d(BackgroundType::Night)
         } else {
-            self.background_texture_atlas
+            assets.background_texture_atlas
                 .get_texture_2d(BackgroundType::Day)
         };
 
@@ -206,7 +194,7 @@ impl Node for World {
 
         // Draw score if greater than 0
         if self.score > 0 {
-            self.draw_score();
+            self.draw_score(&assets);
         }
     }
 }

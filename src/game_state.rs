@@ -1,5 +1,4 @@
 use crate::assets::Assets;
-use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
 use crate::player::Player;
@@ -33,9 +32,7 @@ pub struct GameOverState {
 }
 
 impl GameState {
-    pub async fn new() -> Self {
-        let background_texture_atlas = BackgroundTextureAtlas::new().await;
-        let world = World::new(background_texture_atlas).await;
+    pub async fn new(assets: &Assets) -> Self {
         let music_player = MusicPlayer::new("assets/music", 2.0)
             .await
             .expect("Failed to load music");
@@ -43,7 +40,7 @@ impl GameState {
         GameState::StartScreen(StartScreenState {
             music_player,
             sound_effects,
-            world,
+            world: World::new(&assets),
         })
     }
 
@@ -53,13 +50,11 @@ impl GameState {
                 state.music_player.play();
                 state.music_player.update();
                 if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-                    let world = &mut state.world;
-                    world.restart();
                     return GameState::Playing(PlayingState {
                         music_player: state.music_player,
                         sound_effects: state.sound_effects,
                         player: Player::new(assets),
-                        world: state.world,
+                        world: World::new(assets),
                     });
                 }
                 let dt = get_frame_time();

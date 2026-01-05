@@ -8,22 +8,22 @@ use macroquad::math::vec2;
 use macroquad::prelude::{DrawTextureParams, draw_texture_ex};
 
 pub struct Base {
-    pub base_texture_atlas: BaseTextureAtlas,
     pub velocity: u16,
     pub height: f32,
+    pub width: f32,
     pub x1: f32,
     pub x2: f32,
     pub stopped: bool,
 }
 
 impl Base {
-    pub async fn new(base_texture_atlas: BaseTextureAtlas, velocity: u16) -> Base {
+    pub fn new(base_texture_atlas: &BaseTextureAtlas, velocity: u16) -> Base {
         let height = base_texture_atlas.height;
         let width = base_texture_atlas.width;
         Base {
-            base_texture_atlas,
             velocity,
             height,
+            width,
             x1: 0.0,
             x2: width,
             stopped: false,
@@ -39,8 +39,8 @@ impl Base {
     }
 
     pub fn touched(&self, player: &Player) -> bool {
-        let width = self.base_texture_atlas.width;
-        let height = self.base_texture_atlas.height;
+        let width = self.width;
+        let height = self.height;
         let y = SCREEN_HEIGHT - height;
 
         let player_x = player.position.x;
@@ -71,7 +71,7 @@ impl Node for Base {
             self.x1 -= speed;
             self.x2 -= speed;
 
-            let width = self.base_texture_atlas.width;
+            let width = self.width;
 
             if self.x1 + width <= 0.0 {
                 self.x1 = self.x2 + width;
@@ -83,11 +83,11 @@ impl Node for Base {
         }
     }
 
-    fn draw(&mut self, _assets: &Assets) {
-        let width = self.base_texture_atlas.width;
-        let height = self.base_texture_atlas.height;
+    fn draw(&mut self, assets: &Assets) {
+        let width = self.width;
+        let height = self.height;
         let y = SCREEN_HEIGHT - height;
-        let texture = &self.base_texture_atlas.texture;
+        let texture = &assets.base_texture_atlas.texture;
 
         // Draw first base
         draw_texture_ex(

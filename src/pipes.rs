@@ -1,12 +1,11 @@
 use crate::assets::Assets;
 use crate::components::Node;
-use crate::pipe_texture_atlas::{PipeColor, PipeTextureAtlas};
+use crate::pipe_texture_atlas::PipeColor;
 use crate::player::Player;
 use crate::{SCREEN_HEIGHT, SCREEN_WIDTH};
 use macroquad::color::WHITE;
 use macroquad::math::{Vec2, vec2};
 use macroquad::prelude::{DrawTextureParams, draw_texture_ex};
-use std::rc::Rc;
 
 #[derive(Clone, Debug)]
 pub enum PipeLocation {
@@ -23,7 +22,6 @@ pub enum PipeLocation {
 }
 
 pub struct Pipe {
-    pub pipe_texture_atlas: Rc<PipeTextureAtlas>,
     pub velocity: u16,
     pub reflected: bool,
     position: Vec2,
@@ -32,25 +30,26 @@ pub struct Pipe {
     stopped: bool,
     score: u32,
     pub passed: bool,
+    height: f32,
+    width: f32,
 }
 
 const GAP_SIZE: f32 = 140.0;
 
 impl Pipe {
     pub fn new(
-        pipe_texture_atlas: Rc<PipeTextureAtlas>,
         reflected: bool,
         velocity: u16,
         pipe_location: PipeLocation,
         base_height: f32,
         score: u32,
+        assets: &Assets,
     ) -> Pipe {
         // Spawn off-screen to the right
         let x = SCREEN_WIDTH;
         let y = 0.0;
 
         Pipe {
-            pipe_texture_atlas,
             velocity,
             reflected,
             position: vec2(x, y),
@@ -59,6 +58,8 @@ impl Pipe {
             stopped: false,
             score,
             passed: false,
+            height: assets.pipe_texture_atlas.height,
+            width: assets.pipe_texture_atlas.width,
         }
     }
 
@@ -74,8 +75,8 @@ impl Pipe {
         self.stopped = false;
     }
 
-    pub fn is_off_screen(&self) -> bool {
-        self.position.x + self.pipe_texture_atlas.width < 0.0
+    pub fn is_off_screen(&self, assets: &Assets) -> bool {
+        self.position.x + assets.pipe_texture_atlas.width < 0.0
     }
 
     fn get_pipe_y_and_height(&self) -> (f32, f32) {
@@ -103,7 +104,7 @@ impl Pipe {
         };
 
         let top_pipe_bottom_y = min_bottom_y + (range * percentage);
-        let pipe_height = self.pipe_texture_atlas.height;
+        let pipe_height = self.height;
 
         if self.reflected {
             // Top pipe (upside down) - bottom edge at top_pipe_bottom_y
@@ -119,7 +120,7 @@ impl Pipe {
     pub fn touched(&self, player: &Player) -> bool {
         let (pipe_y, pipe_height) = self.get_pipe_y_and_height();
         let pipe_x = self.position.x;
-        let pipe_width = self.pipe_texture_atlas.width;
+        let pipe_width = self.width;
 
         let player_x = player.position.x;
         let player_y = player.position.y;
@@ -142,14 +143,14 @@ impl Node for Pipe {
         }
     }
 
-    fn draw(&mut self, _assets: &Assets) {
+    fn draw(&mut self, assets: &Assets) {
         let (y, pipe_height) = self.get_pipe_y_and_height();
-        let pipe_width = self.pipe_texture_atlas.width;
+        let pipe_width = assets.pipe_texture_atlas.width;
 
         let texture = if (self.score / 5) % 2 != 0 {
-            self.pipe_texture_atlas.get_texture_2d(PipeColor::Green)
+            assets.pipe_texture_atlas.get_texture_2d(PipeColor::Green)
         } else {
-            self.pipe_texture_atlas.get_texture_2d(PipeColor::Red)
+            assets.pipe_texture_atlas.get_texture_2d(PipeColor::Red)
         };
 
         draw_texture_ex(
