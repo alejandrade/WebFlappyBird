@@ -1,3 +1,4 @@
+use crate::assets::Assets;
 use crate::background_texture_atlas::BackgroundTextureAtlas;
 use crate::components::Node;
 use crate::music_player::MusicPlayer;
@@ -18,21 +19,18 @@ pub struct StartScreenState {
     sound_effects: SoundEffects,
     world: World,
     player: Player,
-    gameover_texture: Texture2D,
 }
 pub struct PlayingState {
     music_player: MusicPlayer,
     sound_effects: SoundEffects,
     world: World,
     player: Player,
-    gameover_texture: Texture2D,
 }
 pub struct GameOverState {
     music_player: MusicPlayer,
     sound_effects: SoundEffects,
     world: World,
     player: Player,
-    gameover_texture: Texture2D,
 }
 
 impl GameState {
@@ -44,15 +42,11 @@ impl GameState {
             .await
             .expect("Failed to load music");
         let sound_effects = SoundEffects::new().await;
-        let gameover_texture = load_texture("assets/sprites/gameover.png")
-            .await
-            .expect("Failed to load gameover texture");
         GameState::StartScreen(StartScreenState {
             music_player,
             sound_effects,
             player,
             world,
-            gameover_texture,
         })
     }
 
@@ -67,7 +61,6 @@ impl GameState {
                         sound_effects: state.sound_effects,
                         player: state.player,
                         world: state.world,
-                        gameover_texture: state.gameover_texture,
                     });
                 }
                 let dt = get_frame_time();
@@ -108,7 +101,6 @@ impl GameState {
                         sound_effects: state.sound_effects,
                         world: state.world,
                         player: state.player,
-                        gameover_texture: state.gameover_texture,
                     });
                 }
                 return GameState::Playing(state);
@@ -123,7 +115,6 @@ impl GameState {
                         sound_effects: state.sound_effects,
                         player: state.player,
                         world: state.world,
-                        gameover_texture: state.gameover_texture,
                     });
                 }
                 let dt = get_frame_time();
@@ -135,7 +126,7 @@ impl GameState {
         }
     }
 
-    pub fn draw(&mut self, message: &Texture2D) {
+    pub fn draw(&mut self, message: &Texture2D, assets: &Assets) {
         match self {
             GameState::StartScreen(state) => {
                 state.world.draw();
@@ -153,9 +144,9 @@ impl GameState {
                 state.player.draw();
 
                 // Draw gameover image centered
-                let gameover_x = (SCREEN_WIDTH - state.gameover_texture.width()) / 2.0;
-                let gameover_y = (SCREEN_HEIGHT - state.gameover_texture.height()) / 2.0 - 100.0;
-                draw_texture(&state.gameover_texture, gameover_x, gameover_y, WHITE);
+                let gameover_x = (SCREEN_WIDTH - assets.gameover_texture.width()) / 2.0;
+                let gameover_y = (SCREEN_HEIGHT - assets.gameover_texture.height()) / 2.0 - 100.0;
+                draw_texture(&assets.gameover_texture, gameover_x, gameover_y, WHITE);
 
                 // Draw instructions (two lines)
                 let font_size = 20.0;
@@ -169,7 +160,7 @@ impl GameState {
 
                 let line1_x = (SCREEN_WIDTH - line1_dimensions.width) / 2.0;
                 let line2_x = (SCREEN_WIDTH - line2_dimensions.width) / 2.0;
-                let start_y = gameover_y + state.gameover_texture.height() + 50.0;
+                let start_y = gameover_y + assets.gameover_texture.height() + 50.0;
 
                 draw_text(line1, line1_x, start_y, font_size, WHITE);
                 draw_text(line2, line2_x, start_y + line_spacing, font_size, WHITE);

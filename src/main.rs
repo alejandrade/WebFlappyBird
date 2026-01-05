@@ -1,3 +1,4 @@
+mod assets;
 mod background_texture_atlas;
 mod base;
 mod base_texture_atlas;
@@ -62,11 +63,12 @@ async fn main() {
     message.set_filter(FilterMode::Nearest);
 
     let mut game_state = GameState::new().await;
+    let assets = assets::Assets::load().await;
 
     loop {
         clear_background(BLACK);
         game_state = game_state.update();
-        game_state.draw(&message);
+        game_state.draw(&message, &assets);
         next_frame().await
     }
 }
