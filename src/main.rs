@@ -51,8 +51,8 @@ fn draw_loading_screen() {
     }
 }
 
-const FIXED_DELTA: f32 = 1.0 / 60.0; // 60 FPS fixed timestep
-const MAX_FRAME_TIME: f32 = 5.0; // Cap at 250ms to prevent spiral of death
+const FIXED_DELTA: f32 = 1.0 / 60.0;
+const MAX_FRAME_TIME: f32 = 5.0;
 
 #[macroquad::main(window_conf)]
 async fn main() {
