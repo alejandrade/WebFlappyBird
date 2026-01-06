@@ -53,6 +53,8 @@ fn draw_loading_screen() {
 
 const FIXED_DELTA: f32 = 1.0 / 60.0; // 60 FPS fixed timestep
 const MAX_FRAME_TIME: f32 = 0.25; // Cap at 250ms to prevent spiral of death
+const TARGET_FPS: f32 = 60.0; // Target FPS for rendering
+const TARGET_FRAME_TIME: f32 = 1.0 / TARGET_FPS; // Time per frame at target FPS
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -71,6 +73,7 @@ async fn main() {
     let mut fps_timer = 0.0;
 
     loop {
+        let frame_start = std::time::Instant::now();
         let delta = get_frame_time();
         
         // Update music player every frame (not fixed timestep)
@@ -105,6 +108,13 @@ async fn main() {
         clear_background(BLACK);
         game_state.draw(&message, alpha);
         next_frame().await;
+        
+        // Cap FPS by sleeping if frame completed too quickly
+        let frame_duration = frame_start.elapsed();
+        if frame_duration.as_secs_f32() < TARGET_FRAME_TIME {
+            let sleep_duration = std::time::Duration::from_secs_f32(TARGET_FRAME_TIME - frame_duration.as_secs_f32());
+            std::thread::sleep(sleep_duration);
+        }
         
         frame_count += 1;
         fps_timer += delta;
