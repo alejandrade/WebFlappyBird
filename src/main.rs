@@ -51,6 +51,9 @@ fn draw_loading_screen() {
     }
 }
 
+const FIXED_DELTA: f32 = 1.0 / 60.0; // 60 FPS fixed timestep
+const MAX_FRAME_TIME: f32 = 0.25; // Cap at 250ms to prevent spiral of death
+
 #[macroquad::main(window_conf)]
 async fn main() {
     clear_background(BLACK);
@@ -61,13 +64,55 @@ async fn main() {
         .expect("Failed to load message");
     message.set_filter(FilterMode::Nearest);
 
-
     let mut game_state = GameState::new().await;
+    
+    let mut accumulator = 0.0;
+    let mut frame_count = 0;
+    let mut fps_timer = 0.0;
 
     loop {
+        let delta = get_frame_time();
+        
+        // Update music player every frame (not fixed timestep)
+        game_state.update_music();
+        
+        // Check inputs every frame to catch them even if they're missed during fixed updates
+        game_state.check_inputs_every_frame();
+        
+        accumulator += delta;
+        
+        if accumulator > MAX_FRAME_TIME {
+            accumulator = MAX_FRAME_TIME;
+            println!("[WARNING] Frame time exceeded MAX_FRAME_TIME, capped at {:.3}s", MAX_FRAME_TIME);
+        }
+        
+        let mut fixed_updates_this_frame = 0;
+        while accumulator >= FIXED_DELTA {
+            game_state.update(FIXED_DELTA);
+            accumulator -= FIXED_DELTA;
+            fixed_updates_this_frame += 1;
+        }
+        
+        if fixed_updates_this_frame > 1 {
+            println!(
+                "[FIXED-UPDATE] Multiple fixed updates this frame: {} (delta: {:.4}s, accumulator: {:.4}s)",
+                fixed_updates_this_frame, delta, accumulator
+            );
+        }
+        
+        let alpha = accumulator / FIXED_DELTA;
+        
         clear_background(BLACK);
-        game_state.update();
-        game_state.draw(&message);
-        next_frame().await
+        game_state.draw(&message, alpha);
+        next_frame().await;
+        
+        frame_count += 1;
+        fps_timer += delta;
+        if fps_timer >= 1.0 {
+            let fps = frame_count as f32 / fps_timer;
+            println!("FPS: {:.2}", fps);
+            frame_count = 0;
+            fps_timer = 0.0;
+        }
     }
 }

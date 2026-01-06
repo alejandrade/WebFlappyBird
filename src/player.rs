@@ -1,5 +1,4 @@
 use macroquad::color::WHITE;
-use macroquad::input::{is_key_pressed, is_mouse_button_pressed, KeyCode, MouseButton};
 use macroquad::math::{vec2, Vec2};
 use macroquad::prelude::draw_texture_ex;
 use macroquad::texture::DrawTextureParams;
@@ -49,6 +48,18 @@ impl Player {
         self.vel = Vec2::new(0.0, 0.0);
         self.rotation = 0.0;
     }
+
+    /// Handle jump input (called with buffered input state)
+    pub fn handle_jump(&mut self) {
+        if self.alive {
+            self.vel.y = if self.vel.y < 0.0 {
+                self.jump_force - 100.0
+            } else {
+                self.jump_force
+            };
+            println!("{}", self.vel.y);
+        }
+    }
 }
 impl Node for Player {
 
@@ -66,19 +77,7 @@ impl Node for Player {
         self.position.y += self.vel.y * dt;
         self.position.x += self.vel.x * dt;
 
-        if self.alive {
-            // Only allow jumping when alive
-            if is_key_pressed(KeyCode::Space) || is_mouse_button_pressed(MouseButton::Left) {
-
-                self.vel.y = if self.vel.y < 0.0 {
-                    self.jump_force - 100.0
-                }else {
-                    self.jump_force
-                };
-
-                println!("{}", self.vel.y )
-            }
-        } else {
+        if !self.alive {
             self.rotation -= 1.5 * dt;
         }
     }
