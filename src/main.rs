@@ -51,9 +51,9 @@ fn draw_loading_screen() {
     }
 }
 
-const FIXED_DELTA: f32 = 1.0 / 60.0;
-const MAX_FRAME_TIME: f32 = 0.25;
-const MAX_FIXED_UPDATES_PER_FRAME: u32 = 5; // Prevent too many updates in one frame
+const FIXED_DELTA: f32 = 1.0 / 60.0; // Fixed timestep for consistent physics
+const MAX_FRAME_TIME: f32 = 0.25; // Cap frame time to prevent spiral of death
+const MAX_FIXED_UPDATES_PER_FRAME: u32 = 5; // Limit updates per frame to prevent visual "wiggle" from lag spikes
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -67,23 +67,27 @@ async fn main() {
 
     let mut game_state = GameState::new().await;
 
-    let mut accumulator = 0.0;
+    let mut accumulator = 0.0; // Tracks time to spend on fixed updates
     let mut frame_count = 0;
     let mut fps_timer = 0.0;
-    let mut last_delta = FIXED_DELTA; // For smoothing frame time spikes
+    let mut last_delta = FIXED_DELTA; // Previous frame time for smoothing
 
     loop {
         let mut delta = get_frame_time();
 
+        // Smooth large frame spikes (e.g., from touch events) to reduce visual jitter
         if delta > FIXED_DELTA * 2.0 {
             delta = last_delta * 0.5 + delta * 0.5;
         }
         last_delta = delta;
 
+        // Update music every frame for smooth playback
         game_state.update_music();
-
+        
+        // Buffer inputs every frame to prevent missed inputs (fixed updates may skip frames)
         game_state.check_inputs_every_frame();
 
+        // Accumulate frame time for fixed timestep updates
         accumulator += delta;
 
         if accumulator > MAX_FRAME_TIME {
@@ -91,6 +95,7 @@ async fn main() {
             println!("[WARNING] Frame time exceeded MAX_FRAME_TIME, capped at {:.3}s", MAX_FRAME_TIME);
         }
 
+        // Run fixed updates until we've consumed accumulated time (up to the cap)
         let mut fixed_updates_this_frame = 0;
         while accumulator >= FIXED_DELTA && fixed_updates_this_frame < MAX_FIXED_UPDATES_PER_FRAME {
             game_state.update(FIXED_DELTA);
@@ -98,6 +103,7 @@ async fn main() {
             fixed_updates_this_frame += 1;
         }
         
+        // Discard excess time if we hit the update cap (prevents catch-up spiral)
         if fixed_updates_this_frame >= MAX_FIXED_UPDATES_PER_FRAME && accumulator >= FIXED_DELTA {
             println!("[WARNING] Hit max fixed updates per frame ({}), discarding {:.4}s of excess time", 
                      MAX_FIXED_UPDATES_PER_FRAME, accumulator);
@@ -111,6 +117,7 @@ async fn main() {
             );
         }
 
+        // Alpha for interpolation between fixed updates (smoother rendering)
         let alpha = accumulator / FIXED_DELTA;
 
         clear_background(BLACK);

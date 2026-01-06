@@ -64,14 +64,19 @@ impl GameState {
     }
 
     /// Check inputs every frame (not just during fixed updates)
-    /// Buffer inputs so they can be processed during fixed updates
+    /// 
+    /// IMPORTANT: Inputs must be checked every frame because:
+    /// - Fixed updates may skip frames when running fast
+    /// - Quick taps could be missed if only checked during fixed updates
+    /// - Buffering ensures inputs are processed even if they occur between updates
     pub fn check_inputs_every_frame(&mut self) {
         self.debug_input_frame_count += 1;
         
+        // Poll for new input events this frame
         let space_pressed = is_key_pressed(KeyCode::Space);
         let mouse_pressed = is_mouse_button_pressed(MouseButton::Left);
         
-        // Buffer inputs - set to true if pressed, don't clear until processed
+        // Buffer detected inputs (stay true until consumed by fixed update)
         if space_pressed {
             self.input_buffer_space = true;
         }
@@ -105,8 +110,8 @@ impl GameState {
     fn handle_input(&mut self) -> (bool, bool) {
         self.debug_fixed_update_count += 1;
         
-        // Read buffered inputs (don't clear yet - will be cleared at end of update)
-        // This ensures inputs detected between fixed updates are still processed
+        // Read buffered inputs from check_inputs_every_frame()
+        // Buffers cleared at end of update() to ensure they're processed exactly once
         let space_pressed = self.input_buffer_space;
         let mouse_pressed = self.input_buffer_mouse;
         
@@ -191,7 +196,7 @@ impl GameState {
             }
         }
         
-        // Clear input buffer after all uses (one-shot inputs)
+        // Clear input buffers after processing (prevents repeated jumps from single press)
         self.input_buffer_space = false;
         self.input_buffer_mouse = false;
     }
