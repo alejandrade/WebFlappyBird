@@ -52,7 +52,8 @@ fn draw_loading_screen() {
 }
 
 const FIXED_DELTA: f32 = 1.0 / 60.0;
-const MAX_FRAME_TIME: f32 = 5.0;
+const MAX_FRAME_TIME: f32 = 0.25;
+const MAX_FIXED_UPDATES_PER_FRAME: u32 = 5; // Prevent too many updates in one frame
 
 #[macroquad::main(window_conf)]
 async fn main() {
@@ -69,14 +70,18 @@ async fn main() {
     let mut accumulator = 0.0;
     let mut frame_count = 0;
     let mut fps_timer = 0.0;
+    let mut last_delta = FIXED_DELTA; // For smoothing frame time spikes
 
     loop {
-        let delta = get_frame_time();
+        let mut delta = get_frame_time();
 
-        // Update music player every frame (not fixed timestep)
+        if delta > FIXED_DELTA * 2.0 {
+            delta = last_delta * 0.5 + delta * 0.5;
+        }
+        last_delta = delta;
+
         game_state.update_music();
 
-        // Check inputs every frame to catch them even if they're missed during fixed updates
         game_state.check_inputs_every_frame();
 
         accumulator += delta;
@@ -87,10 +92,16 @@ async fn main() {
         }
 
         let mut fixed_updates_this_frame = 0;
-        while accumulator >= FIXED_DELTA {
+        while accumulator >= FIXED_DELTA && fixed_updates_this_frame < MAX_FIXED_UPDATES_PER_FRAME {
             game_state.update(FIXED_DELTA);
             accumulator -= FIXED_DELTA;
             fixed_updates_this_frame += 1;
+        }
+        
+        if fixed_updates_this_frame >= MAX_FIXED_UPDATES_PER_FRAME && accumulator >= FIXED_DELTA {
+            println!("[WARNING] Hit max fixed updates per frame ({}), discarding {:.4}s of excess time", 
+                     MAX_FIXED_UPDATES_PER_FRAME, accumulator);
+            accumulator = 0.0;
         }
 
         if fixed_updates_this_frame > 1 {
